@@ -9,6 +9,7 @@ const els = {
   packTicks: document.getElementById('packTicks'),
   statsBody: document.getElementById('statsBody'),
   statsEmpty: document.getElementById('statsEmpty'),
+  statsToggleBtn: document.getElementById('statsToggleBtn'),
   historyList: document.getElementById('historyList'),
   historyEmpty: document.getElementById('historyEmpty'),
   storageBadge: document.getElementById('storageBadge'),
@@ -20,6 +21,8 @@ const els = {
 };
 
 let entries = [];
+let statsExpanded = false;
+const STATS_DEFAULT_LIMIT = 10;
 
 /* ---------- helpers ---------- */
 
@@ -257,6 +260,17 @@ function renderStats() {
   els.statsBody.innerHTML = '';
   els.statsEmpty.style.display = days.length ? 'none' : 'block';
 
+  const displayDays = statsExpanded ? days : days.slice(0, STATS_DEFAULT_LIMIT);
+
+  if (days.length > STATS_DEFAULT_LIMIT) {
+    els.statsToggleBtn.style.display = 'block';
+    els.statsToggleBtn.textContent = statsExpanded
+      ? 'نمایش کمتر'
+      : `نمایش همه (${pd(days.length)} روز)`;
+  } else {
+    els.statsToggleBtn.style.display = 'none';
+  }
+
   let maxKey = null; let minKey = null;
   if (days.length > 1) {
     const smokedDays = days.filter((d) => d.smoked > 0);
@@ -267,7 +281,7 @@ function renderStats() {
     }
   }
 
-  days.forEach((d) => {
+  displayDays.forEach((d) => {
     const tr = document.createElement('tr');
     if (d.key === maxKey) tr.className = 'day-max';
     if (d.key === minKey) tr.className = 'day-min';
@@ -290,6 +304,11 @@ function renderAll() {
   renderHistory();
   renderStats();
 }
+
+els.statsToggleBtn.addEventListener('click', () => {
+  statsExpanded = !statsExpanded;
+  renderStats();
+});
 
 /* ---------- actions ---------- */
 
