@@ -1,0 +1,19 @@
+{
+  "name": "سیگارشمار",
+  "short_name": "سیگارشمار",
+  "description": "ثبت و پیگیری مصرف سیگار به‌صورت آفلاین با تقویم شمسی",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17181A",
+  "theme_color": "#17181A",
+  "dir": "rtl",
+  "lang": "fa",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-180-maskable.png", "sizes": "180x180", "type": "image/png", "purpose": "maskable" }
+  ]
+}
