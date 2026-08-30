@@ -194,6 +194,17 @@ tr.day-min td:first-child { color: var(--good); font-weight: 700; }
   padding: 14px 4px 18px;
 }
 
+.show-more-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 4px 14px;
+  text-align: center;
+}
+
 /* History list -------------------------------------------------- */
 .history-list { list-style: none; margin: 0; padding: 0; }
 
