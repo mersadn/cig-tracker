@@ -48,6 +48,16 @@ async function addEntry(entry) {
   });
 }
 
+async function updateEntry(entry) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_ENTRIES, 'readwrite');
+    tx.objectStore(STORE_ENTRIES).put(entry);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 async function deleteEntry(id) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -99,5 +109,5 @@ async function setSetting(key, value) {
 }
 
 const DB = {
-  addEntry, deleteEntry, getAllEntries, clearAllEntries, getSetting, setSetting,
+  addEntry, updateEntry, deleteEntry, getAllEntries, clearAllEntries, getSetting, setSetting,
 };
