@@ -135,8 +135,10 @@ function renderHistory() {
         <div class="h-title">${TYPE_LABEL[e.type] || e.type}</div>
         <div class="h-sub">${sub}</div>
       </div>
+      <button class="h-edit" title="ویرایش" aria-label="ویرایش">✏️</button>
       <button class="h-del" title="حذف" aria-label="حذف">✕</button>
     `;
+    li.querySelector('.h-edit').addEventListener('click', () => openEditModal(e));
     li.querySelector('.h-del').addEventListener('click', () => confirmDelete(e.id));
     els.historyList.appendChild(li);
   });
@@ -157,6 +159,85 @@ function confirmDelete(id) {
       },
     },
   ]);
+}
+
+function openEditModal(entry) {
+  const date = new Date(entry.timestamp);
+  const { jy, jm, jd } = Jalali.fromDate(date);
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+
+  const typeOptionsHtml = Object.keys(TYPE_LABEL).map((t) => (
+    `<option value="${t}" ${t === entry.type ? 'selected' : ''}>${TYPE_LABEL[t]}</option>`
+  )).join('');
+
+  const monthOptionsHtml = Jalali.MONTHS.map((m, i) => (
+    `<option value="${i + 1}" ${i + 1 === jm ? 'selected' : ''}>${m}</option>`
+  )).join('');
+
+  openModal('ویرایش رویداد', `
+    <label for="editType">نوع رویداد</label>
+    <select id="editType" class="edit-select">${typeOptionsHtml}</select>
+
+    <div id="editPriceWrap" style="display:${entry.type === 'purchase' ? 'block' : 'none'}">
+      <label for="editPrice">قیمت پاکت (تومان)</label>
+      <input id="editPrice" type="number" inputmode="numeric" value="${entry.price || ''}">
+    </div>
+
+    <label>تاریخ (شمسی)</label>
+    <div class="edit-date-row">
+      <input id="editDay" type="number" min="1" max="31" value="${jd}" placeholder="روز">
+      <select id="editMonth" class="edit-select">${monthOptionsHtml}</select>
+      <input id="editYear" type="number" value="${jy}" placeholder="سال">
+    </div>
+
+    <label for="editTime">ساعت</label>
+    <input id="editTime" type="time" value="${hh}:${mm}">
+  `, [
+    { label: 'انصراف', cls: 'secondary', onClick: closeModal },
+    {
+      label: 'ذخیره تغییرات',
+      cls: 'primary',
+      onClick: async () => {
+        const type = document.getElementById('editType').value;
+        const priceVal = document.getElementById('editPrice').value;
+        const day = Number(document.getElementById('editDay').value);
+        const month = Number(document.getElementById('editMonth').value);
+        const year = Number(document.getElementById('editYear').value);
+        const timeVal = document.getElementById('editTime').value || '00:00';
+        const [th, tm] = timeVal.split(':').map(Number);
+
+        let newDate;
+        try {
+          const g = Jalali.toGregorian(year, month, day);
+          newDate = new Date(g.gy, g.gm - 1, g.gd, th, tm);
+        } catch (err) {
+          toast('تاریخ نامعتبر است');
+          return;
+        }
+
+        const updated = {
+          ...entry,
+          type,
+          qty: type === 'purchase' ? PER_PACK : 1,
+          price: type === 'purchase' ? (priceVal ? Number(priceVal) : null) : undefined,
+          timestamp: newDate.getTime(),
+          dayKey: Jalali.dayKey(newDate),
+        };
+        if (type !== 'purchase') delete updated.price;
+
+        await DB.updateEntry(updated);
+        await loadEntries();
+        renderAll();
+        closeModal();
+        toast('تغییرات ذخیره شد');
+      },
+    },
+  ]);
+
+  document.getElementById('editType').addEventListener('change', (ev) => {
+    document.getElementById('editPriceWrap').style.display = ev.target.value === 'purchase' ? 'block' : 'none';
+  });
 }
 
 function renderStats() {
