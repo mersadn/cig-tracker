@@ -108,6 +108,45 @@ async function setSetting(key, value) {
   });
 }
 
+async function getAllSettings() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_SETTINGS, 'readonly');
+    const req = tx.objectStore(STORE_SETTINGS).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/* Replaces ALL data (entries + settings) with the given arrays.
+ * Used when restoring from a backup file. Original entry ids are
+ * preserved (put, not add) so the restore is byte-for-byte. */
+async function restoreAll(entries, settings) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([STORE_ENTRIES, STORE_SETTINGS], 'readwrite');
+    const entryStore = tx.objectStore(STORE_ENTRIES);
+    const settingStore = tx.objectStore(STORE_SETTINGS);
+
+    entryStore.clear();
+    (entries || []).forEach((e) => entryStore.put(e));
+
+    settingStore.clear();
+    (settings || []).forEach((s) => settingStore.put(s));
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 const DB = {
-  addEntry, updateEntry, deleteEntry, getAllEntries, clearAllEntries, getSetting, setSetting,
+  addEntry,
+  updateEntry,
+  deleteEntry,
+  getAllEntries,
+  clearAllEntries,
+  getSetting,
+  setSetting,
+  getAllSettings,
+  restoreAll,
 };
