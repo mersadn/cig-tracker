@@ -335,10 +335,11 @@ tr.day-min td:first-child { color: var(--good); font-weight: 700; }
 .modal p { font-size: 13.5px; color: var(--paper); line-height: 1.9; margin: 6px 0; }
 .modal p.muted { color: var(--muted); font-size: 12.5px; }
 
-.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 
 .btn {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: calc(50% - 4px);
   border: none;
   border-radius: 12px;
   padding: 13px 10px;
