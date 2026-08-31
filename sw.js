@@ -1,6 +1,6 @@
 /* Cache-first app-shell service worker.
  * Bump CACHE_NAME on every deploy so users get updates. */
-const CACHE_NAME = 'cigtrack-v2';
+const CACHE_NAME = 'cigtrack-v3';
 
 const ASSETS = [
   './',
