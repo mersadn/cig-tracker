@@ -352,6 +352,119 @@ document.querySelectorAll('.action-btn').forEach((btn) => {
   });
 });
 
+/* ---------- backup / restore ---------- */
+
+function backupFileName() {
+  const now = new Date();
+  const { jy, jm, jd } = Jalali.fromDate(now);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `sigarshomar-backup-${jy}-${pad(jm)}-${pad(jd)}.json`;
+}
+
+async function buildBackupPayload() {
+  const [allEntries, allSettings] = await Promise.all([
+    DB.getAllEntries(),
+    DB.getAllSettings(),
+  ]);
+  return {
+    app: 'cigtrack',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    entries: allEntries,
+    settings: allSettings,
+  };
+}
+
+async function runBackup() {
+  let payload;
+  try {
+    payload = await buildBackupPayload();
+  } catch (err) {
+    toast('خطا در آماده‌سازی فایل پشتیبان');
+    return;
+  }
+  const json = JSON.stringify(payload, null, 2);
+  const fileName = backupFileName();
+
+  // Prefer the native "save as" picker so the user chooses exactly where
+  // the file goes. Falls back to a normal download (which lands in the
+  // browser/OS default Downloads location) where the picker isn't supported.
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      toast('فایل پشتیبان ذخیره شد ✔');
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return; // user cancelled the picker
+      // fall through to download fallback below
+    }
+  }
+
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('فایل پشتیبان در پوشه دانلودها ذخیره شد ✔');
+}
+
+function pickRestoreFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data || data.app !== 'cigtrack' || !Array.isArray(data.entries)) {
+        toast('این فایل، فایل پشتیبان معتبر سیگارشمار نیست');
+        return;
+      }
+      confirmRestore(data);
+    } catch (err) {
+      toast('خواندن فایل با خطا مواجه شد');
+    }
+  });
+  input.click();
+}
+
+function confirmRestore(data) {
+  const count = data.entries.length;
+  openModal('بازیابی از فایل پشتیبان', `
+    <p>این فایل شامل <b>${pd(count)}</b> رویداد است.</p>
+    <p class="muted">با ادامه، تمام اطلاعات فعلی برنامه پاک و با اطلاعات این فایل جایگزین می‌شود. این کار قابل بازگشت نیست.</p>
+  `, [
+    { label: 'انصراف', cls: 'secondary', onClick: closeModal },
+    {
+      label: 'بازیابی و جایگزینی',
+      cls: 'danger',
+      onClick: async () => {
+        try {
+          await DB.restoreAll(data.entries, data.settings || []);
+          await loadEntries();
+          renderAll();
+          closeModal();
+          toast('اطلاعات با موفقیت بازیابی شد ✔');
+        } catch (err) {
+          toast('خطا در بازیابی اطلاعات');
+        }
+      },
+    },
+  ]);
+}
+
 /* ---------- settings modal ---------- */
 
 document.getElementById('btnSettings').addEventListener('click', async () => {
@@ -360,8 +473,11 @@ document.getElementById('btnSettings').addEventListener('click', async () => {
   openModal('تنظیمات', `
     <p>وضعیت ذخیره‌سازی دائمی: <b>${persisted ? 'فعال ✅' : 'غیرفعال'}</b></p>
     <p class="muted">تمام اطلاعات به‌صورت محلی روی همین گوشی و در حافظه مرورگر/برنامه ذخیره می‌شود و آفلاین کار می‌کند. رفرش کردن یا بستن برنامه چیزی را پاک نمی‌کند.</p>
+    <p class="muted">برای اطمینان کامل (مثلاً پاک شدن کش مرورگر یا تعویض گوشی)، از بخش زیر یک فایل پشتیبان بگیرید و همان را برای بازگردانی اطلاعات استفاده کنید.</p>
   `, [
     { label: 'بستن', cls: 'secondary', onClick: closeModal },
+    { label: 'بازیابی از فایل پشتیبان', cls: 'secondary', onClick: pickRestoreFile },
+    { label: 'پشتیبان‌گیری (ذخیره فایل)', cls: 'primary', onClick: runBackup },
     {
       label: 'پاک کردن کامل اطلاعات',
       cls: 'danger',
