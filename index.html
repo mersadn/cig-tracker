@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<meta name="theme-color" content="#17181A">
-<meta name="description" content="ثبت و پیگیری مصرف سیگار به‌صورت آفلاین با تقویم شمسی">
-<title>سیگارشمار</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-180-maskable.png">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="description" content="ثبت و پیگیری مصرف سیگار به‌صورت آفلاین با تقویم شمسی - Glassmorphism Design">
+  <title>سیگارشمار</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app">
 
-  <!-- ===== Header : inventory ===== -->
+  <!-- ===== Header ===== -->
   <header class="hero">
     <div class="hero-top">
       <h1>سیگارشمار</h1>
-      <button id="btnSettings" class="icon-btn" aria-label="تنظیمات" title="تنظیمات">⚙</button>
+      <button id="btnSettings" class="icon-btn" aria-label="تنظیمات" title="تنظیمات">⚙️</button>
     </div>
 
+    <!-- ===== Stock Card ===== -->
     <div class="stock-card">
       <div class="stock-number" id="stockNumber">۰</div>
       <div class="stock-label">نخ سیگار موجود</div>
@@ -29,37 +30,37 @@
     </div>
   </header>
 
-  <!-- ===== Actions ===== -->
+  <!-- ===== Action Buttons ===== -->
   <section class="actions">
-    <button class="action-btn buy" data-action="purchase">
+    <button class="action-btn buy" data-action="purchase" aria-label="خرید پاکت جدید">
       <span class="a-icon">📦</span>
       <span class="a-title">خرید پاکت</span>
       <span class="a-sub">۲۰ نخ + قیمت</span>
     </button>
 
-    <button class="action-btn smoke" data-action="smoke">
+    <button class="action-btn smoke" data-action="smoke" aria-label="کشیدن یک نخ">
       <span class="a-icon">🔥</span>
       <span class="a-title">کشیدن یک نخ</span>
       <span class="a-sub">از موجودی من</span>
     </button>
 
-    <button class="action-btn borrow" data-action="borrow_smoke">
+    <button class="action-btn borrow" data-action="borrow_smoke" aria-label="نخ قرضی کشیدم">
       <span class="a-icon">🤝</span>
       <span class="a-title">نخ قرضی کشیدم</span>
       <span class="a-sub">از موجودی من نیست</span>
     </button>
 
-    <button class="action-btn lend" data-action="lend">
+    <button class="action-btn lend" data-action="lend" aria-label="قرض دادم">
       <span class="a-icon">🎁</span>
       <span class="a-title">قرض دادم</span>
       <span class="a-sub">از موجودی من کم می‌شود</span>
     </button>
   </section>
 
-  <!-- ===== Stats table ===== -->
+  <!-- ===== Daily Stats ===== -->
   <section class="panel">
     <div class="panel-head">
-      <h2>آمار روزانه (۲۴ ساعته)</h2>
+      <h2>📊 آمار روزانه (۲۴ ساعته)</h2>
     </div>
     <div class="table-wrap">
       <table id="statsTable">
@@ -78,21 +79,30 @@
     </div>
   </section>
 
+  <!-- ===== Monthly Insights ===== -->
+  <section class="panel" id="insightsPanel">
+    <div class="panel-head">
+      <h2>📈 بینش ماهانه</h2>
+    </div>
+    <div id="insightsContent"></div>
+  </section>
+
   <!-- ===== History ===== -->
   <section class="panel">
     <div class="panel-head">
-      <h2>تاریخچه</h2>
+      <h2>⏱️ تاریخچه</h2>
     </div>
     <ul class="history-list" id="historyList"></ul>
     <p class="empty-hint" id="historyEmpty">هنوز رویدادی ثبت نشده است.</p>
   </section>
 
+  <!-- ===== Footer ===== -->
   <footer class="foot">
     <span id="storageBadge"></span>
   </footer>
 </div>
 
-<!-- ===== Generic modal ===== -->
+<!-- ===== Modal Dialog ===== -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal" id="modal" role="dialog" aria-modal="true">
     <h3 id="modalTitle"></h3>
@@ -101,8 +111,10 @@
   </div>
 </div>
 
+<!-- ===== Toast Notification ===== -->
 <div class="toast" id="toast"></div>
 
+<!-- ===== Scripts ===== -->
 <script src="jalali.js"></script>
 <script src="db.js"></script>
 <script src="app.js"></script>
