@@ -1,19 +1,47 @@
 {
-  "name": "سیگارشمار",
+  "name": "سیگارشمار - Neon Edition",
   "short_name": "سیگارشمار",
-  "description": "ثبت و پیگیری مصرف سیگار به‌صورت آفلاین با تقویم شمسی",
+  "description": "ثبت و پیگیری مصرف سیگار به‌صورت آفلاین با تقویم شمسی | Glassmorphism Design",
   "start_url": "./index.html",
   "scope": "./",
   "id": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#17181A",
-  "theme_color": "#17181A",
+  "background_color": "#0a0e27",
+  "theme_color": "#00f5ff",
   "dir": "rtl",
   "lang": "fa",
+  "screenshots": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-180-maskable.png", "sizes": "180x180", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "کشیدن یک نخ",
+      "short_name": "کشیدن",
+      "description": "ثبت سریع کشیدن یک نخ سیگار",
+      "url": "./index.html?action=smoke",
+      "icons": []
+    },
+    {
+      "name": "خرید پاکت جدید",
+      "short_name": "خرید",
+      "description": "ثبت خرید پاکت جدید",
+      "url": "./index.html?action=purchase",
+      "icons": []
+    }
   ]
 }
